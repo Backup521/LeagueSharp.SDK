@@ -88,7 +88,19 @@ namespace AutoLevelup
             }
             else if (Player.ChampionName  == "Ekko") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "FiddleSticks") abilitySequence = new int[] { 2, 3, 1, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-            else if (Player.ChampionName  == "Fiora") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+            else if (Player.ChampionName  == "Fiora")
+            { 
+                if (Smite != SpellSlot.Unknown)
+                {
+                    abilitySequence = new int[] { 3, 1, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    tipo = " Jungle";
+                }
+                else
+                {
+                    abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
+                    tipo = " Lane";
+                }
+        }
             else if (Player.ChampionName  == "Fizz") abilitySequence = new int[] { 1, 3, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "Galio") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "Gangplank") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
@@ -442,7 +454,7 @@ namespace AutoLevelup
             else if (Player.ChampionName  == "Zyra") abilitySequence = new int[] { 3, 2, 1, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
 
             Game.OnUpdate += Game_OnUpdate;
-            Game.PrintChat("<font color='#C80046'>AutoLevelup Updated by AAc</font>");
+            Game.PrintChat("<font color='#C80046'>AutoLevelup Loaded</font>");
             Game.PrintChat(Player.ChampionName  + tipo + " Loaded");
         }
 
