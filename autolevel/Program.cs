@@ -132,7 +132,7 @@ namespace AutoLevelup
             else if (Player.ChampionName  == "Karthus") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "Kassadin") abilitySequence = new int[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "Katarina") abilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-            else if (Player.ChampionName  == "Kalista") abilitySequence = new int[] { 3, 1, 3, 2, 3, 4, 1, 3, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
+            else if (Player.ChampionName  == "Kalista") abilitySequence = new int[] { 3, 1, 2, 3, 3, 4, 1, 3, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
             else if (Player.ChampionName  == "Kayle")
             {
                 if (Smite != SpellSlot.Unknown)
