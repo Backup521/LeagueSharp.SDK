@@ -19,7 +19,6 @@
 //   A static (stack) class which contains a sort-of cached versions of the important game objects.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace LeagueSharp.SDK.Core
 {
     using System;
@@ -622,18 +621,14 @@ namespace LeagueSharp.SDK.Core
                         ObjectManager.Get<Obj_AI_Minion>()
                             .Where(
                                 o =>
-                                o.Team != GameObjectTeam.Neutral && !o.CharData.BaseSkinName.ToLower().Contains("ward")
-                                && !o.CharData.BaseSkinName.ToLower().Contains("trinket")
-                                && !o.CharData.BaseSkinName.Equals("gangplankbarrel")));
+                                o.Team != GameObjectTeam.Neutral && !o.Name.Contains("ward")
+                                && !o.Name.Contains("trinket") && !o.CharData.BaseSkinName.Equals("gangplankbarrel")));
                     TurretsList.AddRange(ObjectManager.Get<Obj_AI_Turret>());
                     InhibitorsList.AddRange(ObjectManager.Get<Obj_BarracksDampener>());
                     JungleList.AddRange(ObjectManager.Get<Obj_AI_Minion>().Where(o => o.Team == GameObjectTeam.Neutral));
                     WardsList.AddRange(
                         ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(
-                                o =>
-                                o.CharData.BaseSkinName.ToLower().Contains("ward")
-                                || o.CharData.BaseSkinName.ToLower().Contains("trinket")));
+                            .Where(o => o.Name.Contains("ward") || o.Name.Contains("trinket")));
                     ShopsList.AddRange(ObjectManager.Get<Obj_Shop>());
                     SpawnPointsList.AddRange(ObjectManager.Get<Obj_SpawnPoint>());
                     GameObjectsList.AddRange(ObjectManager.Get<GameObject>());
@@ -716,20 +711,7 @@ namespace LeagueSharp.SDK.Core
             {
                 if (minion.Team != GameObjectTeam.Neutral)
                 {
-                    if (minion.CharData.BaseSkinName.ToLower().Contains("ward")
-                        || minion.CharData.BaseSkinName.ToLower().Contains("trinket"))
-                    {
-                        WardsList.Add(minion);
-                        if (minion.IsEnemy)
-                        {
-                            EnemyWardsList.Add(minion);
-                        }
-                        else
-                        {
-                            AllyWardsList.Add(minion);
-                        }
-                    }
-                    else if (!minion.CharData.BaseSkinName.Equals("gangplankbarrel"))
+                    if (!minion.Name.Contains("ward") || !minion.Name.Contains("trinket"))
                     {
                         MinionsList.Add(minion);
                         if (minion.IsEnemy)
@@ -741,6 +723,18 @@ namespace LeagueSharp.SDK.Core
                         {
                             AllyMinionsList.Add(minion);
                             AllyList.Add(minion);
+                        }
+                    }
+                    else
+                    {
+                        WardsList.Add(minion);
+                        if (minion.IsEnemy)
+                        {
+                            EnemyWardsList.Add(minion);
+                        }
+                        else
+                        {
+                            AllyWardsList.Add(minion);
                         }
                     }
                 }
@@ -889,23 +883,7 @@ namespace LeagueSharp.SDK.Core
             {
                 if (minion.Team != GameObjectTeam.Neutral)
                 {
-                    if (minion.CharData.BaseSkinName.ToLower().Contains("ward")
-                        || minion.CharData.BaseSkinName.ToLower().Contains("trinket"))
-                    {
-                        foreach (var ward in WardsList.Where(w => w.Compare(minion)).ToList())
-                        {
-                            WardsList.Remove(ward);
-                            if (minion.IsEnemy)
-                            {
-                                EnemyWardsList.Remove(ward);
-                            }
-                            else
-                            {
-                                AllyWardsList.Remove(ward);
-                            }
-                        }
-                    }
-                    else if (!minion.CharData.BaseSkinName.Equals("gangplankbarrel"))
+                    if (!minion.Name.Contains("ward") || !minion.Name.Contains("trinket"))
                     {
                         foreach (var minionObject in MinionsList.Where(m => m.Compare(minion)).ToList())
                         {
@@ -918,7 +896,22 @@ namespace LeagueSharp.SDK.Core
                             else
                             {
                                 AllyMinionsList.Remove(minionObject);
-                                AllyList.Remove(minionObject);
+                                EnemyList.Remove(minionObject);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var ward in WardsList.Where(w => w.Compare(minion)).ToList())
+                        {
+                            WardsList.Remove(ward);
+                            if (minion.IsEnemy)
+                            {
+                                EnemyWardsList.Remove(ward);
+                            }
+                            else
+                            {
+                                AllyWardsList.Remove(ward);
                             }
                         }
                     }

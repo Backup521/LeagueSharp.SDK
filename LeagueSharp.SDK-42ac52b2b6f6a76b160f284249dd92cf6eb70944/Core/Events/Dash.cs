@@ -105,11 +105,11 @@ namespace LeagueSharp.SDK.Core.Events
         public static bool IsDashing(this Obj_AI_Base unit)
         {
             DashArgs value;
-            if (DetectedDashes.TryGetValue(unit.NetworkId, out value) && unit.Path.Length != 0)
+            if (DetectedDashes.TryGetValue(unit.NetworkId, out value))
             {
-                return value.EndTick != 0;
+                return value.EndTick > Variables.TickCount;
             }
-            
+
             return false;
         }
 
@@ -125,43 +125,36 @@ namespace LeagueSharp.SDK.Core.Events
         private static void ObjAiHeroOnOnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
         {
             var hero = sender as Obj_AI_Hero;
-            if (hero != null && hero.IsValid)
+            if (hero != null && hero.IsValid && args.IsDash)
             {
                 if (!DetectedDashes.ContainsKey(hero.NetworkId))
                 {
                     DetectedDashes.Add(hero.NetworkId, new DashArgs());
                 }
-                if (args.IsDash)
-                {
-                    var path = new List<Vector2> { hero.ServerPosition.ToVector2() };
-                    path.AddRange(args.Path.ToList().ToVector2());
 
-                    DetectedDashes[hero.NetworkId] = new DashArgs
-                                                         {
-                                                             StartTick = Variables.TickCount - Game.Ping / 2,
-                                                             Speed = args.Speed,
-                                                             StartPos = hero.ServerPosition.ToVector2(), Unit = sender,
-                                                             Path = path, EndPos = path.Last(),
-                                                             EndTick =
-                                                                 Variables.TickCount - Game.Ping / 2
-                                                                 + ((int)
-                                                                    (1000
-                                                                     * (DetectedDashes[hero.NetworkId].EndPos.Distance(
-                                                                         DetectedDashes[hero.NetworkId].StartPos)
-                                                                        / DetectedDashes[hero.NetworkId].Speed))),
-                                                             Duration =
-                                                                 DetectedDashes[hero.NetworkId].EndTick
-                                                                 - DetectedDashes[hero.NetworkId].StartTick
-                                                         };
+                var path = new List<Vector2> { hero.ServerPosition.ToVector2() };
+                path.AddRange(args.Path.ToList().ToVector2());
 
-                    if (OnDash != null)
-                    {
-                        OnDash(MethodBase.GetCurrentMethod().DeclaringType, DetectedDashes[hero.NetworkId]);
-                    }
-                }
-                else
+                DetectedDashes[hero.NetworkId] = new DashArgs
+                                                     {
+                                                         StartTick = Variables.TickCount - Game.Ping / 2, 
+                                                         Speed = args.Speed, StartPos = hero.ServerPosition.ToVector2(), 
+                                                         Unit = sender, Path = path, EndPos = path.Last(), 
+                                                         EndTick =
+                                                             Variables.TickCount - Game.Ping / 2
+                                                             + ((int)
+                                                                (1000
+                                                                 * (DetectedDashes[hero.NetworkId].EndPos.Distance(
+                                                                     DetectedDashes[hero.NetworkId].StartPos)
+                                                                    / DetectedDashes[hero.NetworkId].Speed))), 
+                                                         Duration =
+                                                             DetectedDashes[hero.NetworkId].EndTick
+                                                             - DetectedDashes[hero.NetworkId].StartTick
+                                                     };
+
+                if (OnDash != null)
                 {
-                    DetectedDashes[hero.NetworkId].EndTick = 0;
+                    OnDash(MethodBase.GetCurrentMethod().DeclaringType, DetectedDashes[hero.NetworkId]);
                 }
             }
         }
