@@ -1,31 +1,37 @@
-﻿// <copyright file="Spell.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Spell.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Spell Container
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Wrappers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Enumerations;
-    using Extensions;
-    using Extensions.SharpDX;
-    using Math.Prediction;
+
+    using LeagueSharp.SDK.Core.Enumerations;
+    using LeagueSharp.SDK.Core.Extensions;
+    using LeagueSharp.SDK.Core.Extensions.SharpDX;
+    using LeagueSharp.SDK.Core.Math.Prediction;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX;
-    using Utils;
 
     /// <summary>
     ///     Spell Container
@@ -70,6 +76,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Spell" /> class.
+        ///     Instances a new Spell
         /// </summary>
         /// <param name="spellDataWrapper">
         ///     SpellSlot Wrapper
@@ -197,7 +204,13 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <summary>
         ///     Gets the instance.
         /// </summary>
-        public SpellDataInst Instance => GameObjects.Player.Spellbook.GetSpell(this.Slot);
+        public SpellDataInst Instance
+        {
+            get
+            {
+                return GameObjects.Player.Spellbook.GetSpell(this.Slot);
+            }
+        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether is charged spell.
@@ -234,7 +247,13 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <summary>
         ///     Gets the level.
         /// </summary>
-        public int Level => GameObjects.Player.Spellbook.GetSpell(this.Slot).Level;
+        public int Level
+        {
+            get
+            {
+                return GameObjects.Player.Spellbook.GetSpell(this.Slot).Level;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the min hit chance.
@@ -258,8 +277,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
                     return this.ChargedMinRange
                            + Math.Min(
                                this.ChargedMaxRange - this.ChargedMinRange, 
-                               ((Variables.TickCount - this.chargedCastedT)
-                               * (this.ChargedMaxRange - this.ChargedMinRange) / this.ChargeDuration) - 150);
+                               (Variables.TickCount - this.chargedCastedT)
+                               * (this.ChargedMaxRange - this.ChargedMinRange) / this.ChargeDuration - 150);
                 }
 
                 return this.ChargedMaxRange;
@@ -292,7 +311,13 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <summary>
         ///     Gets the range squared.
         /// </summary>
-        public float RangeSqr => this.Range * this.Range;
+        public float RangeSqr
+        {
+            get
+            {
+                return this.Range * this.Range;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the slot.
@@ -657,7 +682,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <returns>Unit's predicted health</returns>
         public float GetHealthPrediction(Obj_AI_Base unit)
         {
-            var time = (int)((this.Delay * 1000) + (this.From.Distance(unit.ServerPosition) / this.Speed) - 100);
+            var time = (int)(this.Delay * 1000 + this.From.Distance(unit.ServerPosition) / this.Speed - 100);
             return Health.GetPrediction(unit, time);
         }
 
@@ -788,7 +813,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
         {
             return
                 this.IsInRange(
-                    (obj as Obj_AI_Base)?.ServerPosition.ToVector2() ?? obj.Position.ToVector2(), 
+                    obj is Obj_AI_Base ? ((Obj_AI_Base)obj).ServerPosition.ToVector2() : obj.Position.ToVector2(), 
                     otherRange);
         }
 
@@ -898,8 +923,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
             float speed, 
             bool collision, 
             SkillshotType type, 
-            Vector3 fromVector3 = default(Vector3), 
-            Vector3 rangeCheckFromVector3 = default(Vector3))
+            Vector3 fromVector3 = new Vector3(), 
+            Vector3 rangeCheckFromVector3 = new Vector3())
         {
             this.Delay = delay;
             this.Width = skillWidth;
@@ -934,8 +959,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
         public Spell SetSkillshot(
             bool collision, 
             SkillshotType type, 
-            Vector3 fromVector3 = default(Vector3), 
-            Vector3 rangeCheckFromVector3 = default(Vector3))
+            Vector3 fromVector3 = new Vector3(), 
+            Vector3 rangeCheckFromVector3 = new Vector3())
         {
             this.From = fromVector3;
             this.Collision = collision;
@@ -967,8 +992,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
         public Spell SetTargetted(
             float delay, 
             float speed, 
-            Vector3 fromVector3 = default(Vector3), 
-            Vector3 rangeCheckFromVector3 = default(Vector3))
+            Vector3 fromVector3 = new Vector3(), 
+            Vector3 rangeCheckFromVector3 = new Vector3())
         {
             this.Delay = delay;
             this.Speed = speed;
@@ -991,7 +1016,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <returns>
         ///     The <see cref="Spell" />.
         /// </returns>
-        public Spell SetTargetted(Vector3 fromVector3 = default(Vector3), Vector3 rangeCheckFromVector3 = default(Vector3))
+        public Spell SetTargetted(Vector3 fromVector3 = new Vector3(), Vector3 rangeCheckFromVector3 = new Vector3())
         {
             this.From = fromVector3;
             this.RangeCheckFrom = rangeCheckFromVector3;
@@ -1037,8 +1062,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// <param name="fromVector3">From Vector3 Source</param>
         /// <param name="rangeCheckFromVector3">Range Check From Vector3 Source</param>
         public void UpdateSourcePosition(
-            Vector3 fromVector3 = default(Vector3), 
-            Vector3 rangeCheckFromVector3 = default(Vector3))
+            Vector3 fromVector3 = new Vector3(), 
+            Vector3 rangeCheckFromVector3 = new Vector3())
         {
             this.From = fromVector3;
             this.RangeCheckFrom = rangeCheckFromVector3;

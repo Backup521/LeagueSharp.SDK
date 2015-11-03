@@ -1,20 +1,24 @@
-﻿// <copyright file="MenuItem.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MenuItem.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Menu Item
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.UI.IMenu
 {
     using System;
@@ -24,8 +28,8 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
 
-    using Abstracts;
-    using Core.Utils;
+    using LeagueSharp.SDK.Core.UI.IMenu.Abstracts;
+    using LeagueSharp.SDK.Core.Utils;
 
     using SharpDX;
 
@@ -135,7 +139,13 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         ///     Child Menu Component name
         /// </param>
         /// <returns>Null, a menu item is unable to hold an access-able sub component</returns>
-        public override AMenuComponent this[string name] => null;
+        public override AMenuComponent this[string name]
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         #endregion
 
@@ -159,8 +169,15 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         /// </summary>
         public void FireEvent()
         {
-            this.Parent?.FireEvent(this);
-            this.ValueChanged?.Invoke(this, EventArgs.Empty);
+            if (this.Parent != null)
+            {
+                this.Parent.FireEvent(this);
+            }
+
+            if (this.ValueChanged != null)
+            {
+                this.ValueChanged(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -346,7 +363,7 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
             assemblyName = Assembly.GetExecutingAssembly().FullName;
 
             // Get the type using the typeName and assemblyName
-            return Type.GetType($"{typeName}, {assemblyName}");
+            return Type.GetType(string.Format("{0}, {1}", typeName, assemblyName));
         }
 
         #endregion

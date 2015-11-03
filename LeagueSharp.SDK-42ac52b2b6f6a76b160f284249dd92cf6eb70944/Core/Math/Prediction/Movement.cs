@@ -1,32 +1,40 @@
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Movement.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Calculates a prediction based off data values given by the source input and converts it into a output prediction
+//   for movement, containing spell casting position and unit position in 3D-Space.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Math.Prediction
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Enumerations;
-    using Events;
-    using Extensions;
-    using Extensions.SharpDX;
+
+    using LeagueSharp.SDK.Core.Enumerations;
+    using LeagueSharp.SDK.Core.Events;
+    using LeagueSharp.SDK.Core.Extensions;
+    using LeagueSharp.SDK.Core.Extensions.SharpDX;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX;
-    using Utils;
-    using Collision = Collision;
+
+    using Collision = LeagueSharp.SDK.Core.Math.Collision;
 
     /// <summary>
     ///     Calculates a prediction based off data values given by the source input and converts it into a output prediction
@@ -101,7 +109,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// </summary>
         /// <param name="input">PredictionInput type</param>
         /// <param name="additionalSpeed">Additional Speed (Multiplicative)</param>
-        /// <returns>The <see cref="PredictionOutput" /></returns>
+        /// <returns>The <see cref="PredictionOutput"/></returns>
         internal static PredictionOutput GetAdvancedPrediction(PredictionInput input, float additionalSpeed = 0)
         {
             var speed = Math.Abs(additionalSpeed) < float.Epsilon ? input.Speed : input.Speed * additionalSpeed;
@@ -113,12 +121,12 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
 
             var unit = input.Unit;
             var position = PositionAfter(unit, 1, unit.MoveSpeed - 100);
-            var prediction = position + (speed * (input.Delay / 1000));
+            var prediction = position + speed * (input.Delay / 1000);
 
             return new PredictionOutput()
                        {
-                           UnitPosition = new Vector3(position.X, position.Y, unit.ServerPosition.Z),
-                           CastPosition = new Vector3(prediction.X, prediction.Y, unit.ServerPosition.Z),
+                           UnitPosition = new Vector3(position.X, position.Y, unit.ServerPosition.Z), 
+                           CastPosition = new Vector3(prediction.X, prediction.Y, unit.ServerPosition.Z), 
                            Hitchance = HitChance.High
                        };
         }
@@ -141,8 +149,8 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             {
                 // Mid air:
                 var dashPred = GetPositionOnPath(
-                    input,
-                    new List<Vector2> { input.Unit.ServerPosition.ToVector2(), dashData.Path.Last() },
+                    input, 
+                    new List<Vector2> { input.Unit.ServerPosition.ToVector2(), dashData.Path.Last() }, 
                     dashData.Speed);
                 if (dashPred.Hitchance >= HitChance.High)
                 {
@@ -155,13 +163,13 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
                 if (dashData.Path.PathLength() > 200)
                 {
                     var endP = dashData.Path.Last();
-                    var timeToPoint = input.Delay + (input.From.ToVector2().Distance(endP) / input.Speed);
+                    var timeToPoint = input.Delay + input.From.ToVector2().Distance(endP) / input.Speed;
                     if (timeToPoint
-                        <= (input.Unit.Distance(endP) / dashData.Speed) + (input.RealRadius / input.Unit.MoveSpeed))
+                        <= input.Unit.Distance(endP) / dashData.Speed + input.RealRadius / input.Unit.MoveSpeed)
                     {
                         return new PredictionOutput
                                    {
-                                       CastPosition = endP.ToVector3(), UnitPosition = endP.ToVector3(),
+                                       CastPosition = endP.ToVector3(), UnitPosition = endP.ToVector3(), 
                                        Hitchance = HitChance.Dashing
                                    };
                     }
@@ -186,20 +194,20 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <returns><see cref="PredictionOutput" /> output</returns>
         internal static PredictionOutput GetImmobilePrediction(PredictionInput input, double remainingImmobileT)
         {
-            var timeToReachTargetPosition = input.Delay + (input.Unit.Distance(input.From) / input.Speed);
+            var timeToReachTargetPosition = input.Delay + input.Unit.Distance(input.From) / input.Speed;
 
-            if (timeToReachTargetPosition <= remainingImmobileT + (input.RealRadius / input.Unit.MoveSpeed))
+            if (timeToReachTargetPosition <= remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed)
             {
                 return new PredictionOutput
                            {
-                               CastPosition = input.Unit.ServerPosition, UnitPosition = input.Unit.Position,
+                               CastPosition = input.Unit.ServerPosition, UnitPosition = input.Unit.Position, 
                                Hitchance = HitChance.Immobile
                            };
             }
 
             return new PredictionOutput
                        {
-                           Input = input, CastPosition = input.Unit.ServerPosition,
+                           Input = input, CastPosition = input.Unit.ServerPosition, 
                            UnitPosition = input.Unit.ServerPosition, Hitchance = HitChance.High
                        };
         }
@@ -221,7 +229,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             {
                 return new PredictionOutput
                            {
-                               Input = input, UnitPosition = input.Unit.ServerPosition,
+                               Input = input, UnitPosition = input.Unit.ServerPosition, 
                                CastPosition = input.Unit.ServerPosition, Hitchance = HitChance.VeryHigh
                            };
             }
@@ -229,10 +237,10 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             var pLength = path.PathLength();
 
             // Skillshots with only a delay
-            if (pLength >= (input.Delay * speed) - input.RealRadius
+            if (pLength >= input.Delay * speed - input.RealRadius
                 && Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
             {
-                var tDistance = (input.Delay * speed) - input.RealRadius;
+                var tDistance = input.Delay * speed - input.RealRadius;
 
                 for (var i = 0; i < path.Count - 1; i++)
                 {
@@ -244,16 +252,16 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
                     {
                         var direction = (b - a).Normalized();
 
-                        var cp = a + (direction * tDistance);
+                        var cp = a + direction * tDistance;
                         var p = a
-                                + (direction
-                                   * ((i == path.Count - 2)
-                                          ? Math.Min(tDistance + input.RealRadius, d)
-                                          : (tDistance + input.RealRadius)));
+                                + direction
+                                * ((i == path.Count - 2)
+                                       ? Math.Min(tDistance + input.RealRadius, d)
+                                       : (tDistance + input.RealRadius));
 
                         return new PredictionOutput
                                    {
-                                       Input = input, CastPosition = cp.ToVector3(), UnitPosition = p.ToVector3(),
+                                       Input = input, CastPosition = cp.ToVector3(), UnitPosition = p.ToVector3(), 
                                        Hitchance =
                                            Path.PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
                                                ? HitChance.VeryHigh
@@ -266,10 +274,10 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             }
 
             // Skillshot with a delay and speed.
-            if (pLength >= (input.Delay * speed) - input.RealRadius
+            if (pLength >= input.Delay * speed - input.RealRadius
                 && Math.Abs(input.Speed - float.MaxValue) > float.Epsilon)
             {
-                path = path.CutPath(Math.Max(0, (input.Delay * speed) - input.RealRadius));
+                path = path.CutPath(Math.Max(0, input.Delay * speed - input.RealRadius));
                 var tT = 0f;
                 for (var i = 0; i < path.Count - 1; i++)
                 {
@@ -277,14 +285,14 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
                     var b = path[i + 1];
                     var tB = a.Distance(b) / speed;
                     var direction = (b - a).Normalized();
-                    a = a - (speed * tT * direction);
+                    a = a - speed * tT * direction;
                     var sol = a.VectorMovementCollision(b, speed, input.From.ToVector2(), input.Speed, tT);
                     var t = (float)sol[0];
                     var pos = (Vector2)sol[1];
 
                     if (pos.IsValid() && t >= tT && t <= tT + tB)
                     {
-                        var p = pos + (input.RealRadius * direction);
+                        var p = pos + input.RealRadius * direction;
 
                         if (input.Type == SkillshotType.SkillshotLine)
                         {
@@ -301,7 +309,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
 
                         return new PredictionOutput
                                    {
-                                       Input = input, CastPosition = pos.ToVector3(), UnitPosition = p.ToVector3(),
+                                       Input = input, CastPosition = pos.ToVector3(), UnitPosition = p.ToVector3(), 
                                        Hitchance =
                                            Path.PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
                                                ? HitChance.VeryHigh
@@ -316,7 +324,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             var position = path.Last();
             return new PredictionOutput
                        {
-                           Input = input, CastPosition = position.ToVector3(), UnitPosition = position.ToVector3(),
+                           Input = input, CastPosition = position.ToVector3(), UnitPosition = position.ToVector3(), 
                            Hitchance = HitChance.Medium
                        };
         }
@@ -344,7 +352,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             if (ft)
             {
                 // Increase the delay due to the latency and server tick:
-                input.Delay += (Game.Ping / 2000f) + 0.06f;
+                input.Delay += Game.Ping / 2000f + 0.06f;
 
                 if (input.AoE)
                 {
@@ -385,7 +393,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
             {
                 if (result.Hitchance >= HitChance.High
                     && input.RangeCheckFrom.DistanceSquared(input.Unit.Position)
-                    > Math.Pow(input.Range + (input.RealRadius * 3 / 4), 2))
+                    > Math.Pow(input.Range + input.RealRadius * 3 / 4, 2))
                 {
                     result.Hitchance = HitChance.Medium;
                 }
@@ -401,8 +409,8 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
                     if (result.Hitchance != HitChance.OutOfRange)
                     {
                         result.CastPosition = input.RangeCheckFrom
-                                              + (input.Range
-                                                 * (result.UnitPosition - input.RangeCheckFrom).Normalized().SetZ());
+                                              + input.Range
+                                              * (result.UnitPosition - input.RangeCheckFrom).Normalized().SetZ();
                     }
                     else
                     {
@@ -456,7 +464,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <param name="unit">Unit to track</param>
         /// <param name="t">Track time</param>
         /// <param name="speed">Speed of unit</param>
-        /// <returns>The <see cref="Vector2" /> of the after position</returns>
+        /// <returns>The <see cref="Vector2"/> of the after position</returns>
         internal static Vector2 PositionAfter(Obj_AI_Base unit, float t, float speed = float.MaxValue)
         {
             var distance = t * speed;
@@ -474,7 +482,7 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
                 }
                 else
                 {
-                    return a + (distance * (b - a).Normalized());
+                    return a + distance * (b - a).Normalized();
                 }
             }
 
@@ -513,14 +521,50 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         #region Fields
 
         /// <summary>
+        ///     Local flags that contains the unit types that the skill-shit can collide with.
+        /// </summary>
+        private CollisionableObjects collisionableObjects = CollisionableObjects.Minions
+                                                            | CollisionableObjects.YasuoWall;
+
+        /// <summary>
         ///     From source location on a 3D-Space.
         /// </summary>
         private Vector3 @from;
 
         /// <summary>
+        ///     Local width's radius or the angle in case of the cone skill-shot.
+        /// </summary>
+        private float radius = 1f;
+
+        /// <summary>
+        ///     The skill-shot range in units.
+        /// </summary>
+        private float range = float.MaxValue;
+
+        /// <summary>
         ///     Range check from location on a 3D-Space.
         /// </summary>
         private Vector3 rangeCheckFrom;
+
+        /// <summary>
+        ///     The skill-shot speed in units per second.
+        /// </summary>
+        private float speed = float.MaxValue;
+
+        /// <summary>
+        ///     Local skill-shot type.
+        /// </summary>
+        private SkillshotType type = SkillshotType.SkillshotLine;
+
+        /// <summary>
+        ///     Local unit.
+        /// </summary>
+        private Obj_AI_Base unit = ObjectManager.Player;
+
+        /// <summary>
+        ///     Local indication whether to use bounding radius.
+        /// </summary>
+        private bool useBoundingRadius = true;
 
         #endregion
 
@@ -541,8 +585,18 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets or sets the flags that contains the unit types that the skill-shot can collide with.
         /// </summary>
-        public CollisionableObjects CollisionObjects { get; set; } = CollisionableObjects.Minions
-                                                                     | CollisionableObjects.YasuoWall;
+        public CollisionableObjects CollisionObjects
+        {
+            get
+            {
+                return this.collisionableObjects;
+            }
+
+            set
+            {
+                this.collisionableObjects = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the skill-shot delay in seconds.
@@ -568,12 +622,34 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets or sets the skill-shot width's radius or the angle in case of the cone skill shots.
         /// </summary>
-        public float Radius { get; set; } = 1f;
+        public float Radius
+        {
+            get
+            {
+                return this.radius;
+            }
+
+            set
+            {
+                this.radius = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the skill-shot range in units.
         /// </summary>
-        public float Range { get; set; } = float.MaxValue;
+        public float Range
+        {
+            get
+            {
+                return this.range;
+            }
+
+            set
+            {
+                this.range = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the position from where the range is checked.
@@ -596,22 +672,66 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets or sets the skill-shot speed in units per second.
         /// </summary>
-        public float Speed { get; set; } = float.MaxValue;
+        public float Speed
+        {
+            get
+            {
+                return this.speed;
+            }
+
+            set
+            {
+                this.speed = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the skill-shot type.
         /// </summary>
-        public SkillshotType Type { get; set; } = SkillshotType.SkillshotLine;
+        public SkillshotType Type
+        {
+            get
+            {
+                return this.type;
+            }
+
+            set
+            {
+                this.type = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the unit that the prediction will made for.
         /// </summary>
-        public Obj_AI_Base Unit { get; set; } = ObjectManager.Player;
+        public Obj_AI_Base Unit
+        {
+            get
+            {
+                return this.unit;
+            }
+
+            set
+            {
+                this.unit = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether use bounding radius.
         /// </summary>
-        public bool UseBoundingRadius { get; set; } = true;
+        public bool UseBoundingRadius
+        {
+            get
+            {
+                return this.useBoundingRadius;
+            }
+
+            set
+            {
+                this.useBoundingRadius = value;
+            }
+        }
 
         #endregion
 
@@ -620,7 +740,13 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets the the calculated real radius of the unit.
         /// </summary>
-        internal float RealRadius => this.UseBoundingRadius ? this.Radius + this.Unit.BoundingRadius : this.Radius;
+        internal float RealRadius
+        {
+            get
+            {
+                return this.UseBoundingRadius ? this.Radius + this.Unit.BoundingRadius : this.Radius;
+            }
+        }
 
         #endregion
     }
@@ -633,9 +759,24 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         #region Fields
 
         /// <summary>
+        ///     Local Area of Effect targets hit list.
+        /// </summary>
+        private List<Obj_AI_Hero> aoeTargetsHit = new List<Obj_AI_Hero>();
+
+        /// <summary>
         ///     Cast Predicted Position data in a 3D-Space given value.
         /// </summary>
         private Vector3 castPosition;
+
+        /// <summary>
+        ///     Local Collision Objects list.
+        /// </summary>
+        private List<Obj_AI_Base> collisionObjects = new List<Obj_AI_Base>();
+
+        /// <summary>
+        ///     Local hit chance.
+        /// </summary>
+        private HitChance hitChance = HitChance.Impossible;
 
         /// <summary>
         ///     Unit Predicted Position data ina a 3D-Space given value.
@@ -655,12 +796,29 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets or sets the list of the targets that the spell will hit (only if Area of Effect was enabled).
         /// </summary>
-        public List<Obj_AI_Hero> AoeTargetsHit { get; set; } = new List<Obj_AI_Hero>();
+        public List<Obj_AI_Hero> AoeTargetsHit
+        {
+            get
+            {
+                return this.aoeTargetsHit;
+            }
+
+            set
+            {
+                this.aoeTargetsHit = value;
+            }
+        }
 
         /// <summary>
         ///     Gets the number of targets the skill-shot will hit (only if Area of Effect was enabled).
         /// </summary>
-        public int AoeTargetsHitCount => Math.Max(this.AoeHitCount, this.AoeTargetsHit.Count);
+        public int AoeTargetsHitCount
+        {
+            get
+            {
+                return Math.Max(this.AoeHitCount, this.AoeTargetsHit.Count);
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the position where the skill-shot should be casted to increase the accuracy.
@@ -683,12 +841,34 @@ namespace LeagueSharp.SDK.Core.Math.Prediction
         /// <summary>
         ///     Gets or sets the collision objects list which the input source would collide with.
         /// </summary>
-        public List<Obj_AI_Base> CollisionObjects { get; set; } = new List<Obj_AI_Base>();
+        public List<Obj_AI_Base> CollisionObjects
+        {
+            get
+            {
+                return this.collisionObjects;
+            }
+
+            set
+            {
+                this.collisionObjects = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the hit chance.
         /// </summary>
-        public HitChance Hitchance { get; set; } = HitChance.Impossible;
+        public HitChance Hitchance
+        {
+            get
+            {
+                return this.hitChance;
+            }
+
+            set
+            {
+                this.hitChance = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets where the unit is going to be when the skill-shot reaches his position.

@@ -1,34 +1,39 @@
-﻿// <copyright file="TargetSelector.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="TargetSelector.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Target Selector, manageable utility to return the best candidate target based on chosen settings.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Wrappers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Damages;
-    using Enumerations;
-    using Events;
-    using Extensions;
-    using Extensions.SharpDX;
+
+    using LeagueSharp.SDK.Core.Enumerations;
+    using LeagueSharp.SDK.Core.Events;
+    using LeagueSharp.SDK.Core.Extensions;
+    using LeagueSharp.SDK.Core.Extensions.SharpDX;
+    using LeagueSharp.SDK.Core.UI.IMenu;
+    using LeagueSharp.SDK.Core.UI.IMenu.Values;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX;
-    using UI.IMenu;
-    using UI.IMenu.Values;
-    using Utils;
 
     /// <summary>
     ///     Target Selector, manageable utility to return the best candidate target based on chosen settings.
@@ -42,13 +47,13 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// </summary>
         public static readonly string[] HighestPriority =
             {
-                "Ahri", "Anivia", "Annie", "Ashe", "Brand", "Caitlyn",
-                "Cassiopeia", "Corki", "Draven", "Ezreal", "Graves", "Jinx",
-                "Kalista", "Karma", "Karthus", "Katarina", "Kennen",
-                "KogMaw", "Leblanc", "Lucian", "Lux", "Malzahar", "MasterYi",
-                "MissFortune", "Orianna", "Quinn", "Sivir", "Syndra",
-                "Talon", "Teemo", "Tristana", "TwistedFate", "Twitch",
-                "Varus", "Vayne", "Veigar", "VelKoz", "Viktor", "Xerath",
+                "Ahri", "Anivia", "Annie", "Ashe", "Brand", "Caitlyn", 
+                "Cassiopeia", "Corki", "Draven", "Ezreal", "Graves", "Jinx", 
+                "Kalista", "Karma", "Karthus", "Katarina", "Kennen", 
+                "KogMaw", "Leblanc", "Lucian", "Lux", "Malzahar", "MasterYi", 
+                "MissFortune", "Orianna", "Quinn", "Sivir", "Syndra", 
+                "Talon", "Teemo", "Tristana", "TwistedFate", "Twitch", 
+                "Varus", "Vayne", "Veigar", "VelKoz", "Viktor", "Xerath", 
                 "Zed", "Ziggs"
             };
 
@@ -57,12 +62,12 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// </summary>
         public static readonly string[] LowestPriority =
             {
-                "Alistar", "Amumu", "Blitzcrank", "Braum", "Cho'Gath",
-                "Dr. Mundo", "Garen", "Gnar", "Hecarim", "Janna", "Jarvan IV",
-                "Leona", "Lulu", "Malphite", "Nami", "Nasus", "Nautilus",
-                "Nunu", "Olaf", "Rammus", "Renekton", "Sejuani", "Shen",
-                "Shyvana", "Singed", "Sion", "Skarner", "Sona", "Soraka",
-                "Taric", "Thresh", "Volibear", "Warwick", "MonkeyKing",
+                "Alistar", "Amumu", "Blitzcrank", "Braum", "Cho'Gath", 
+                "Dr. Mundo", "Garen", "Gnar", "Hecarim", "Janna", "Jarvan IV", 
+                "Leona", "Lulu", "Malphite", "Nami", "Nasus", "Nautilus", 
+                "Nunu", "Olaf", "Rammus", "Renekton", "Sejuani", "Shen", 
+                "Shyvana", "Singed", "Sion", "Skarner", "Sona", "Soraka", 
+                "Taric", "Thresh", "Volibear", "Warwick", "MonkeyKing", 
                 "Yorick", "Zac", "Zyra"
             };
 
@@ -71,9 +76,9 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// </summary>
         public static readonly string[] MedHighPriority =
             {
-                "Akali", "Diana", "Fiddlesticks", "Fiora", "Fizz",
-                "Heimerdinger", "Jayce", "Kassadin", "Kayle", "Kha'Zix",
-                "Lissandra", "Mordekaiser", "Nidalee", "Riven", "Shaco",
+                "Akali", "Diana", "Fiddlesticks", "Fiora", "Fizz", 
+                "Heimerdinger", "Jayce", "Kassadin", "Kayle", "Kha'Zix", 
+                "Lissandra", "Mordekaiser", "Nidalee", "Riven", "Shaco", 
                 "Vladimir", "Yasuo", "Zilean"
             };
 
@@ -82,10 +87,10 @@ namespace LeagueSharp.SDK.Core.Wrappers
         /// </summary>
         public static readonly string[] MedLowPriority =
             {
-                "Aatrox", "Darius", "Elise", "Evelynn", "Galio", "Gangplank",
-                "Gragas", "Irelia", "Jax", "Lee Sin", "Maokai", "Morgana",
-                "Nocturne", "Pantheon", "Poppy", "Rengar", "Rumble", "Ryze",
-                "Swain", "Trundle", "Tryndamere", "Udyr", "Urgot", "Vi",
+                "Aatrox", "Darius", "Elise", "Evelynn", "Galio", "Gangplank", 
+                "Gragas", "Irelia", "Jax", "Lee Sin", "Maokai", "Morgana", 
+                "Nocturne", "Pantheon", "Poppy", "Rengar", "Rumble", "Ryze", 
+                "Swain", "Trundle", "Tryndamere", "Udyr", "Urgot", "Vi", 
                 "XinZhao", "RekSai"
             };
 
@@ -183,9 +188,9 @@ namespace LeagueSharp.SDK.Core.Wrappers
         ///     The <see cref="Obj_AI_Hero" /> target.
         /// </returns>
         public static Obj_AI_Hero GetTarget(
-            float range = -1f,
-            DamageType damage = DamageType.Physical,
-            IEnumerable<Obj_AI_Hero> ignoredChamps = null,
+            float range = -1f, 
+            DamageType damage = DamageType.Physical, 
+            IEnumerable<Obj_AI_Hero> ignoredChamps = null, 
             Vector3? rangeCheckFrom = null)
         {
             if (menu["focusTarget"].GetValue<MenuBool>().Value && SelectedTarget != null
@@ -231,8 +236,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
         ///     The <see cref="Obj_AI_Hero" /> target.
         /// </returns>
         public static Obj_AI_Hero GetTarget(
-            IEnumerable<Obj_AI_Hero> targets,
-            DamageType damageType = DamageType.Physical,
+            IEnumerable<Obj_AI_Hero> targets, 
+            DamageType damageType = DamageType.Physical, 
             Vector3? rangeCheckFrom = null)
         {
             switch (Mode)
@@ -291,8 +296,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
         ///     The <see cref="Obj_AI_Hero" /> target.
         /// </returns>
         public static Obj_AI_Hero GetTargetNoCollision(
-            Spell spell,
-            IEnumerable<Obj_AI_Hero> champsToIgnore,
+            Spell spell, 
+            IEnumerable<Obj_AI_Hero> champsToIgnore, 
             Vector3? rangeCheckFrom = null)
         {
             var t = GetTarget(spell.Range, spell.DamageType, champsToIgnore, rangeCheckFrom);
@@ -374,7 +379,9 @@ namespace LeagueSharp.SDK.Core.Wrappers
                     menu.Add(new MenuSeparator("separatorMode", "Mode Selection"));
                     menu.Add(
                         new MenuList<TargetSelectorMode>("mode", "Mode")
-                            { SelectedValue = TargetSelectorMode.AutoPriority });
+                            {
+                               SelectedValue = TargetSelectorMode.AutoPriority 
+                            });
 
                     rootMenu.Add(menu);
 
@@ -393,8 +400,8 @@ namespace LeagueSharp.SDK.Core.Wrappers
                             {
                                 var color = menu["drawTargetColor"].GetValue<MenuColor>().Color;
                                 Drawing.DrawCircle(
-                                    SelectedTarget.Position,
-                                    150f,
+                                    SelectedTarget.Position, 
+                                    150f, 
                                     System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B));
                             }
                         };

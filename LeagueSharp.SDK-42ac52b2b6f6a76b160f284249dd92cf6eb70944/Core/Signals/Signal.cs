@@ -1,20 +1,24 @@
-﻿// <copyright file="Signal.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Signal.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   A signal.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Signals
 {
     using System;
@@ -145,7 +149,13 @@ namespace LeagueSharp.SDK.Core.Signals
         /// <value>
         ///     <c>true</c> if expired; otherwise, <c>false</c>.
         /// </value>
-        public bool Expired => DateTimeOffset.Now >= this.Expiration;
+        public bool Expired
+        {
+            get
+            {
+                return DateTimeOffset.Now >= this.Expiration;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the last time the signal was signaled.
@@ -329,7 +339,10 @@ namespace LeagueSharp.SDK.Core.Signals
         /// <param name="enabled">Signal enabled or not..</param>
         internal void TriggerEnabledStatusChanged(object sender, bool enabled)
         {
-            this.OnEnabledStatusChanged?.Invoke(sender, new EnabledStatusChangedArgs(enabled));
+            if (this.OnEnabledStatusChanged != null)
+            {
+                this.OnEnabledStatusChanged(sender, new EnabledStatusChangedArgs(enabled));
+            }
         }
 
         /// <summary>
@@ -338,7 +351,10 @@ namespace LeagueSharp.SDK.Core.Signals
         /// <param name="sender">The sender.</param>
         internal void TriggerOnExipired(object sender)
         {
-            this.OnExpired?.Invoke(sender, new EventArgs());
+            if (this.OnExpired != null)
+            {
+                this.OnExpired(sender, new EventArgs());
+            }
         }
 
         /// <summary>
@@ -357,7 +373,10 @@ namespace LeagueSharp.SDK.Core.Signals
             this.LastSignaled = DateTimeOffset.Now;
             this.OnRaised(sender, new RaisedArgs(reason, this));
 
-            OnSignalRaised?.Invoke(sender, this);
+            if (OnSignalRaised != null)
+            {
+                OnSignalRaised(sender, this);
+            }
         }
 
         #endregion

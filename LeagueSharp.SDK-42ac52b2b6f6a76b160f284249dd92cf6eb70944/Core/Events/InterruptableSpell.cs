@@ -1,27 +1,31 @@
-﻿// <copyright file="InterruptableSpell.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="InterruptableSpell.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Provides events for interrupting spells.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Events
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Enumerations;
+    using LeagueSharp.SDK.Core.Enumerations;
 
     /// <summary>
     ///     Provides events for interrupting spells.
@@ -72,12 +76,24 @@ namespace LeagueSharp.SDK.Core.Events
         /// <summary>
         ///     Gets the casting interruptible spell dictionary.
         /// </summary>
-        public static IReadOnlyDictionary<int, InterruptableSpellData> CastingInterruptableSpell => CastingInterruptableSpellDictionary;
+        public static IReadOnlyDictionary<int, InterruptableSpellData> CastingInterruptableSpell
+        {
+            get
+            {
+                return CastingInterruptableSpellDictionary;
+            }
+        }
 
         /// <summary>
         ///     Gets the interruptible spells dictionary.
         /// </summary>
-        public static IReadOnlyDictionary<string, List<InterruptableSpellData>> InterruptableSpells => InterruptableSpellsDictionary;
+        public static IReadOnlyDictionary<string, List<InterruptableSpellData>> InterruptableSpells
+        {
+            get
+            {
+                return InterruptableSpellsDictionary;
+            }
+        }
 
         #endregion
 
@@ -86,12 +102,12 @@ namespace LeagueSharp.SDK.Core.Events
         /// <summary>
         ///     Gets or sets the casting interrupt-able spell.
         /// </summary>
-        private static Dictionary<int, InterruptableSpellData> CastingInterruptableSpellDictionary { get; }
+        private static Dictionary<int, InterruptableSpellData> CastingInterruptableSpellDictionary { get; set; }
 
         /// <summary>
         ///     Gets or sets the interrupt-able spells.
         /// </summary>
-        private static Dictionary<string, List<InterruptableSpellData>> InterruptableSpellsDictionary { get; }
+        private static Dictionary<string, List<InterruptableSpellData>> InterruptableSpellsDictionary { get; set; }
 
         #endregion
 
@@ -299,17 +315,17 @@ namespace LeagueSharp.SDK.Core.Events
             /// <summary>
             ///     Gets the danger level.
             /// </summary>
-            public DangerLevel DangerLevel { get; }
+            public DangerLevel DangerLevel { get; private set; }
 
             /// <summary>
             ///     Gets a value indicating whether movement interrupts.
             /// </summary>
-            public bool MovementInterrupts { get; }
+            public bool MovementInterrupts { get; private set; }
 
             /// <summary>
             ///     Gets the slot.
             /// </summary>
-            public SpellSlot Slot { get; }
+            public SpellSlot Slot { get; private set; }
 
             #endregion
         }
@@ -365,12 +381,12 @@ namespace LeagueSharp.SDK.Core.Events
             /// <summary>
             ///     Gets a value indicating whether movement interrupts.
             /// </summary>
-            public bool MovementInterrupts { get; }
+            public bool MovementInterrupts { get; private set; }
 
             /// <summary>
             ///     Gets the sender.
             /// </summary>
-            public Obj_AI_Hero Sender { get; }
+            public Obj_AI_Hero Sender { get; private set; }
 
             #endregion
         }

@@ -1,26 +1,31 @@
-﻿// <copyright file="WindowsKeys.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WindowsKeys.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Utility class to translate Windows Messages into keys or into <see cref="WindowsMessages" />
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Utils
 {
     using System;
+    using System.Linq;
     using System.Windows.Forms;
 
-    using Enumerations;
+    using LeagueSharp.SDK.Core.Enumerations;
 
     using SharpDX;
 
@@ -60,7 +65,13 @@ namespace LeagueSharp.SDK.Core.Utils
         /// <summary>
         ///     Gets the textual representation of the input.
         /// </summary>
-        public char Char => Convert.ToChar(this.args.WParam);
+        public char Char
+        {
+            get
+            {
+                return Convert.ToChar(this.args.WParam);
+            }
+        }
 
         /// <summary>
         ///     Gets the Cursor Position
@@ -91,7 +102,13 @@ namespace LeagueSharp.SDK.Core.Utils
         /// <summary>
         ///     Gets the message of the key.
         /// </summary>
-        public WindowsMessages Msg => (WindowsMessages)this.args.Msg;
+        public WindowsMessages Msg
+        {
+            get
+            {
+                return (WindowsMessages)this.args.Msg;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether to process the command.
@@ -117,7 +134,7 @@ namespace LeagueSharp.SDK.Core.Utils
             get
             {
                 var bytes = BitConverter.GetBytes(this.args.WParam);
-                if (bytes.Length > 2)
+                if (bytes.Count() > 2)
                 {
                     int buttonId = bytes[2];
                     var sideButton = Keys.None;
@@ -140,12 +157,24 @@ namespace LeagueSharp.SDK.Core.Utils
         /// <summary>
         ///     Gets the single name of the mapped key.
         /// </summary>
-        public Keys SingleKey => (Keys)((int)this.args.WParam);
+        public Keys SingleKey
+        {
+            get
+            {
+                return (Keys)((int)this.args.WParam);
+            }
+        }
 
         /// <summary>
         ///     Gets the <c>WParam</c>
         /// </summary>
-        public uint WParam => this.args.WParam;
+        public uint WParam
+        {
+            get
+            {
+                return this.args.WParam;
+            }
+        }
 
         #endregion
     }

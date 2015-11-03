@@ -1,27 +1,31 @@
-﻿// <copyright file="Items.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Items.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Item class used to easily manage items.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.Wrappers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Extensions.SharpDX;
+    using LeagueSharp.SDK.Core.Extensions.SharpDX;
 
     using SharpDX;
 
@@ -240,7 +244,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 var item = ItemData.Entries.FirstOrDefault(i => (int)i.Id == id);
                 if (item == null)
                 {
-                    throw new MissingMemberException($"Unable to find item with the id {id}");
+                    throw new MissingMemberException(string.Format("Unable to find item with the id {0}", id));
                 }
 
                 this.Id = (int)item.Id;
@@ -248,10 +252,10 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 this.Range = range;
                 this.BasePrice = item.Price;
                 this.SellPrice = (int)(item.Price * item.SellBackModifier);
-                //this.TotalPrice = item.Price
-                //                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
+                this.TotalPrice = item.Price
+                                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
                 this.Purchaseable = item.CanBeSold;
-                //this.From = item.RecipeItem.Cast<int>().ToArray();
+                this.From = item.RecipeItem.Cast<int>().ToArray();
                 this.Stacks = item.MaxStack;
                 this.HideFromAll = !item.UsableInStore;
             }
@@ -267,7 +271,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 var item = ItemData.Entries.FirstOrDefault(x => x.Id == id);
                 if (item == null)
                 {
-                    throw new MissingMemberException($"Unable to find item with the id {id}");
+                    throw new MissingMemberException(string.Format("Unable to find item with the id {0}", id));
                 }
 
                 this.Id = (int)item.Id;
@@ -275,10 +279,10 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 this.Range = range;
                 this.BasePrice = item.Price;
                 this.SellPrice = (int)(item.Price * item.SellBackModifier);
-                //this.TotalPrice = item.Price
-                //                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
+                this.TotalPrice = item.Price
+                                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
                 this.Purchaseable = item.CanBeSold;
-                //this.From = item.RecipeItem.Cast<int>().ToArray();
+                this.From = item.RecipeItem.Cast<int>().ToArray();
                 this.Stacks = item.MaxStack;
                 this.HideFromAll = !item.UsableInStore;
             }
@@ -305,12 +309,18 @@ namespace LeagueSharp.SDK.Core.Wrappers
             /// <summary>
             ///     Gets the Id of the Item.
             /// </summary>
-            public int Id { get; }
+            public int Id { get; private set; }
 
             /// <summary>
             ///     Gets a value indicating whether is ready.
             /// </summary>
-            public bool IsReady => CanUseItem(this.Id);
+            public bool IsReady
+            {
+                get
+                {
+                    return CanUseItem(this.Id);
+                }
+            }
 
             /// <summary>
             ///     Gets the Name of the Item

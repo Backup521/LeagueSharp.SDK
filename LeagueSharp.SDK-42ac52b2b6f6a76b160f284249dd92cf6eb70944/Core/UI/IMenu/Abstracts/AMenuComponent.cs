@@ -1,29 +1,35 @@
-﻿// <copyright file="AMenuComponent.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AMenuComponent.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Abstract build of a menu component.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.UI.IMenu.Abstracts
 {
     using System;
     using System.Dynamic;
     using System.Linq;
-    using Core.Utils;
+    using System.Reflection;
+
+    using LeagueSharp.SDK.Core.UI.IMenu.Skins;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX;
-    using Skins;
-    using Values;
 
     /// <summary>
     ///     Abstract build of a menu component.
@@ -121,8 +127,9 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Abstracts
             {
                 if (this.resetWidth)
                 {
-                    this.menuWidthCached = this.Parent?.Components.Max(comp => comp.Value.Width)
-                                           ?? MenuManager.Instance.Menus.Max(menu => menu.Width);
+                    this.menuWidthCached = this.Parent != null
+                                               ? this.Parent.Components.Max(comp => comp.Value.Width)
+                                               : MenuManager.Instance.Menus.Max(menu => menu.Width);
                     this.resetWidth = false;
                 }
 
@@ -237,63 +244,6 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Abstracts
         #endregion
 
         #region Public Methods and Operators
-
-        /// <summary>
-        ///     AMenuComponent conversion operator to a <see cref="bool" />.
-        /// </summary>
-        /// <param name="component">
-        ///     The component
-        /// </param>
-        /// <returns>
-        ///     The <see cref="bool" />.
-        /// </returns>
-        public static implicit operator bool(AMenuComponent component)
-        {
-            return component.GetValue<MenuBool>().Value;
-        }
-
-        /// <summary>
-        ///     AMenuComponent conversion operator to a <see cref="ColorBGRA" />.
-        /// </summary>
-        /// <param name="component">
-        ///     The component
-        /// </param>
-        /// <returns>
-        ///     The <see cref="ColorBGRA" />.
-        /// </returns>
-        public static implicit operator ColorBGRA(AMenuComponent component)
-        {
-            return component.GetValue<MenuColor>().Color;
-        }
-
-        /// <summary>
-        ///     AMenuComponent conversion operator to a <see cref="Color" />.
-        /// </summary>
-        /// <param name="component">
-        ///     The component
-        /// </param>
-        /// <returns>
-        ///     The <see cref="System.Drawing.Color" />.
-        /// </returns>
-        public static implicit operator System.Drawing.Color(AMenuComponent component)
-        {
-            var color = component.GetValue<MenuColor>().Color;
-            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-        }
-
-        /// <summary>
-        ///     AMenuComponent conversion operator to a <see cref="int" />.
-        /// </summary>
-        /// <param name="component">
-        ///     The component
-        /// </param>
-        /// <returns>
-        ///     The <see cref="int" />.
-        /// </returns>
-        public static implicit operator int(AMenuComponent component)
-        {
-            return component.GetValue<MenuSlider>().Value;
-        }
 
         /// <summary>
         ///     Get the value of a child with a certain name.

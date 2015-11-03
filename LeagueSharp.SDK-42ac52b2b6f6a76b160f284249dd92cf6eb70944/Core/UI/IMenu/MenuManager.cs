@@ -1,20 +1,24 @@
-﻿// <copyright file="MenuManager.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MenuManager.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   Menu Interface class, used to control the menu.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.UI.IMenu
 {
     using System;
@@ -22,10 +26,12 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
     using System.IO;
     using System.Linq;
     using System.Windows.Forms;
-    using Core.Utils;
-    using Enumerations;
+
+    using LeagueSharp.SDK.Core.Enumerations;
+    using LeagueSharp.SDK.Core.UI.IMenu.Skins;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX.Direct3D9;
-    using Skins;
 
     /// <summary>
     ///     Menu Interface class, used to control the menu.
@@ -40,8 +46,8 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         public static readonly DirectoryInfo ConfigFolder =
             Directory.CreateDirectory(
                 Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "LS" + Environment.UserName.GetHashCode().ToString("X"),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                    "LS" + Environment.UserName.GetHashCode().ToString("X"), 
                     "MenuConfigSDK"));
 
         /// <summary>
@@ -142,7 +148,13 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         /// <value>
         ///     The menus.
         /// </value>
-        public List<Menu> Menus => this.menus;
+        public List<Menu> Menus
+        {
+            get
+            {
+                return this.menus;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether the menu is visible.
@@ -170,7 +182,7 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         /// <summary>
         ///     Gets The Sprite used to draw the components of the menu on.
         /// </summary>
-        public Sprite Sprite { get; }
+        public Sprite Sprite { get; private set; }
 
         #endregion
 
@@ -237,7 +249,11 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         /// </summary>
         protected virtual void FireOnClose()
         {
-            this.OnClose?.Invoke(this, EventArgs.Empty);
+            var handler = this.OnClose;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -245,18 +261,11 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
         /// </summary>
         protected virtual void FireOnOpen()
         {
-            this.OnOpen?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        ///     OnUpdate event.
-        /// </summary>
-        /// <param name="args">
-        ///     The event data
-        /// </param>
-        private static void Game_OnUpdate(EventArgs args)
-        {
-            // Do nothing.
+            var handler = this.OnOpen;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -317,10 +326,10 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
             var keys = new WindowsKeys(args);
             if (!this.ForcedOpen)
             {
-                if (keys.SingleKey == Keys.ShiftKey || keys.Key == (Keys.Return | Keys.Shift))
+                if (keys.SingleKey == Keys.ShiftKey)
                 {
                     var keyDown = keys.Msg == WindowsMessages.KEYDOWN;
-                    var keyUp = keys.Msg == WindowsMessages.KEYUP || keys.Msg == WindowsMessages.CHAR;
+                    var keyUp = keys.Msg == WindowsMessages.KEYUP;
 
                     if (keyDown)
                     {
@@ -375,6 +384,17 @@ namespace LeagueSharp.SDK.Core.UI.IMenu
                     Console.WriteLine(e.ToString());
                 }
             }
+        }
+
+        /// <summary>
+        ///     OnUpdate event.
+        /// </summary>
+        /// <param name="args">
+        ///     The event data
+        /// </param>
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            // Do nothing.
         }
 
         #endregion

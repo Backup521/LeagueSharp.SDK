@@ -1,30 +1,36 @@
-﻿// <copyright file="DefaultKeyBind.cs" company="LeagueSharp">
-//    Copyright (c) 2015 LeagueSharp.
-// 
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-// 
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-// 
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see http://www.gnu.org/licenses/
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DefaultKeyBind.cs" company="LeagueSharp">
+//   Copyright (C) 2015 LeagueSharp
+//   
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//   
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//   
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-
+// <summary>
+//   A default implementation of <see cref="ADrawable{MenuKeyBind}" />
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
 {
     using System.Windows.Forms;
-    using Core.Utils;
-    using Enumerations;
-    using Extensions.SharpDX;
-    using Math;
+
+    using LeagueSharp.SDK.Core.Enumerations;
+    using LeagueSharp.SDK.Core.Extensions.SharpDX;
+    using LeagueSharp.SDK.Core.Math;
+    using LeagueSharp.SDK.Core.UI.IMenu.Values;
+    using LeagueSharp.SDK.Core.Utils;
+
     using SharpDX;
     using SharpDX.Direct3D9;
-    using Values;
 
     /// <summary>
     ///     A default implementation of <see cref="ADrawable{MenuKeyBind}" />
@@ -65,9 +71,9 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
         public Rectangle ButtonBoundaries(MenuKeyBind component)
         {
             return new Rectangle(
-                (int)(component.Position.X + component.MenuWidth - MenuSettings.ContainerHeight),
-                (int)component.Position.Y,
-                MenuSettings.ContainerHeight,
+                (int)(component.Position.X + component.MenuWidth - MenuSettings.ContainerHeight), 
+                (int)component.Position.Y, 
+                MenuSettings.ContainerHeight, 
                 MenuSettings.ContainerHeight);
         }
 
@@ -90,22 +96,22 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
                     .GetCenteredText(null, MenuSettings.Font, this.Component.DisplayName, CenteredFlags.VerticalCenter)
                     .Y;
             MenuSettings.Font.DrawText(
-                MenuManager.Instance.Sprite,
-                this.Component.Interacting ? "Press a key" : this.Component.DisplayName,
-                (int)(this.Component.Position.X + MenuSettings.ContainerTextOffset),
-                centerY,
+                MenuManager.Instance.Sprite, 
+                this.Component.Interacting ? "Press a key" : this.Component.DisplayName, 
+                (int)(this.Component.Position.X + MenuSettings.ContainerTextOffset), 
+                centerY, 
                 MenuSettings.TextColor);
 
             if (!this.Component.Interacting)
             {
                 var keyString = "[" + this.Component.Key + "]";
                 MenuSettings.Font.DrawText(
-                    MenuManager.Instance.Sprite,
-                    keyString,
+                    MenuManager.Instance.Sprite, 
+                    keyString, 
                     (int)
                     (this.Component.Position.X + this.Component.MenuWidth - MenuSettings.ContainerHeight
-                     - DefaultUtilities.CalcWidthText(keyString) - MenuSettings.ContainerTextOffset),
-                    centerY,
+                     - DefaultUtilities.CalcWidthText(keyString) - MenuSettings.ContainerTextOffset), 
+                    centerY, 
                     MenuSettings.TextColor);
             }
 
@@ -116,32 +122,32 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
                     {
                         new Vector2(
                             (this.Component.Position.X + this.Component.MenuWidth - MenuSettings.ContainerHeight)
-                            + (MenuSettings.ContainerHeight / 2f),
-                            this.Component.Position.Y + 1),
+                            + MenuSettings.ContainerHeight / 2f, 
+                            this.Component.Position.Y + 1), 
                         new Vector2(
                             (this.Component.Position.X + this.Component.MenuWidth - MenuSettings.ContainerHeight)
-                            + (MenuSettings.ContainerHeight / 2f),
+                            + MenuSettings.ContainerHeight / 2f, 
                             this.Component.Position.Y + MenuSettings.ContainerHeight)
-                    },
+                    }, 
                 this.Component.Active ? new ColorBGRA(0, 100, 0, 255) : new ColorBGRA(255, 0, 0, 255));
             Line.End();
 
             var centerX =
                 (int)
                 new Rectangle(
-                    (int)(this.Component.Position.X + this.Component.MenuWidth - MenuSettings.ContainerHeight),
-                    (int)this.Component.Position.Y,
-                    MenuSettings.ContainerHeight,
+                    (int)(this.Component.Position.X + this.Component.MenuWidth - MenuSettings.ContainerHeight), 
+                    (int)this.Component.Position.Y, 
+                    MenuSettings.ContainerHeight, 
                     MenuSettings.ContainerHeight).GetCenteredText(
-                        null,
-                        MenuSettings.Font,
-                        this.Component.Active ? "ON" : "OFF",
+                        null, 
+                        MenuSettings.Font, 
+                        this.Component.Active ? "ON" : "OFF", 
                         CenteredFlags.HorizontalCenter).X;
             MenuSettings.Font.DrawText(
-                MenuManager.Instance.Sprite,
-                this.Component.Active ? "ON" : "OFF",
-                centerX,
-                centerY,
+                MenuManager.Instance.Sprite, 
+                this.Component.Active ? "ON" : "OFF", 
+                centerX, 
+                centerY, 
                 MenuSettings.TextColor);
         }
 
@@ -232,9 +238,9 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
                             var content = this.KeyBindBoundaries(this.Component);
 
                             if (args.Cursor.IsUnderRectangle(
-                                container.X,
-                                container.Y,
-                                container.Width,
+                                container.X, 
+                                container.Y, 
+                                container.Width, 
                                 container.Height))
                             {
                                 this.Component.Active = !this.Component.Active;
@@ -296,11 +302,6 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
         /// </param>
         private static void HandleDown(MenuKeyBind component, Keys expectedKey)
         {
-            if (component.Key == Keys.ControlKey && expectedKey == (Keys.Control | Keys.ControlKey))
-            {
-                expectedKey = Keys.ControlKey;
-            }
-
             if (!component.Interacting && expectedKey == component.Key && component.Type == KeyBindType.Press)
             {
                 component.Active = true;
@@ -316,23 +317,17 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Default
         /// </param>
         private static void HandleUp(MenuKeyBind component, Keys expectedKey)
         {
-            switch (component.Type)
+            if (expectedKey == component.Key)
             {
-                case KeyBindType.Press:
-                    if ((expectedKey.HasFlag(Keys.Shift) && expectedKey.HasFlag(component.Key))
-                        || (expectedKey == component.Key))
-                    {
+                switch (component.Type)
+                {
+                    case KeyBindType.Press:
                         component.Active = false;
-                    }
-
-                    break;
-                case KeyBindType.Toggle:
-                    if (expectedKey == component.Key)
-                    {
+                        break;
+                    case KeyBindType.Toggle:
                         component.Active = !component.Active;
-                    }
-
-                    break;
+                        break;
+                }
             }
         }
 
