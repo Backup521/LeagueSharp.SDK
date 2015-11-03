@@ -47,7 +47,7 @@ namespace LeagueSharp.SDK.Core.UI.IMenu.Skins.Light
         #region Constructors and Destructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="BlueBool" /> class.
+        ///     Initializes a new instance of the <see cref="LightBool" /> class.
         /// </summary>
         /// <param name="component">
         ///     The component
