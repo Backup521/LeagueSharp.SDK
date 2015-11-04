@@ -252,10 +252,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 this.Range = range;
                 this.BasePrice = item.Price;
                 this.SellPrice = (int)(item.Price * item.SellBackModifier);
-                this.TotalPrice = item.Price
-                                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
                 this.Purchaseable = item.CanBeSold;
-                this.From = item.RecipeItem.Cast<int>().ToArray();
                 this.Stacks = item.MaxStack;
                 this.HideFromAll = !item.UsableInStore;
             }
@@ -279,10 +276,7 @@ namespace LeagueSharp.SDK.Core.Wrappers
                 this.Range = range;
                 this.BasePrice = item.Price;
                 this.SellPrice = (int)(item.Price * item.SellBackModifier);
-                this.TotalPrice = item.Price
-                                  + ItemData.Entries.Where(i => item.RecipeItem.Any(j => j == i.Id)).Sum(i => i.Price);
                 this.Purchaseable = item.CanBeSold;
-                this.From = item.RecipeItem.Cast<int>().ToArray();
                 this.Stacks = item.MaxStack;
                 this.HideFromAll = !item.UsableInStore;
             }
