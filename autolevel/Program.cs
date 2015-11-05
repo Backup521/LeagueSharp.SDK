@@ -443,8 +443,7 @@ namespace AutoLevelup
             else if (Player.ChampionName  == "Zyra") abilitySequence = new int[] { 3, 2, 1, 3, 1, 4, 3, 1, 3, 1, 4, 3, 1, 2, 2, 4, 2, 2 };
 
             Game.OnUpdate += Game_OnUpdate;
-            Game.PrintChat("<font color='#C80046'>AutoLevelup Loaded</font>");
-            Game.PrintChat(Player.ChampionName  + tipo + " Loaded");
+            Game.PrintChat(Player.ChampionName + tipo + "<font color='#C80046'> AutoLevelup Loaded</font>");
         }
 
         static void Game_OnUpdate(EventArgs args)
