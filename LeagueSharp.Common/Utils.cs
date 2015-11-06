@@ -221,7 +221,7 @@ namespace LeagueSharp.Common
                 case 45:
                     return "Insert";
                 case 220:
-                    return "?";
+                    return "º";
                 default:
                     return vKey.ToString();
             }

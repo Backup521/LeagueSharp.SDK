@@ -74,12 +74,20 @@ namespace LeagueSharp.Common
                 return false;
             }
 
+            var @base = unit as Obj_AI_Base;
+            if (@base != null)
+            {
+                if (@base.HasBuff("kindredrnodeathbuff") && @base.HealthPercent <= 10)
+                {
+                    return false;
+                }
+            }
+
             if (checkTeam && unit.Team == ObjectManager.Player.Team)
             {
                 return false;
             }
 
-            var @base = unit as Obj_AI_Base;
             var unitPosition = @base != null ? @base.ServerPosition : unit.Position;
 
             return !(range < float.MaxValue) ||
@@ -126,6 +134,15 @@ namespace LeagueSharp.Common
         }
 
         /// <summary>
+        /// Returns the unit's ability power
+        /// </summary>
+        /// 
+        public static float AbilityPower(this Obj_AI_Base @base)
+        {
+            return @base.FlatMagicDamageMod + (@base.PercentMagicDamageMod * @base.FlatMagicDamageMod);
+        }
+
+        /// <summary>
         ///     Returns the unit's health percentage (From 0 to 100).
         /// </summary>
         [Obsolete("Use HealthPercent attribute.", false)]
@@ -151,6 +168,15 @@ namespace LeagueSharp.Common
         public static float TotalAttackDamage(this Obj_AI_Hero target)
         {
             return target.BaseAttackDamage + target.FlatPhysicalDamageMod;
+        }
+
+        /// <summary>
+        ///     Checks if the unit is a Hero or Champion
+        /// </summary>
+        public static bool IsChampion(this Obj_AI_Base unit)
+        {
+            var hero = unit as Obj_AI_Hero;
+            return hero != null && hero.IsValid;
         }
 
         public static bool IsChampion(this Obj_AI_Base unit, string championName)
@@ -253,6 +279,12 @@ namespace LeagueSharp.Common
         {
             var result = new List<Vector2>();
             var Distance = distance;
+            if (distance < 0)
+            {
+                path[0] = path[0] + distance * (path[1] - path[0]).Normalized();
+                return path;
+            }
+            
             for (var i = 0; i < path.Count - 1; i++)
             {
                 var dist = path[i].Distance(path[i + 1]);
@@ -281,7 +313,20 @@ namespace LeagueSharp.Common
             if (unit.IsVisible)
             {
                 result.Add(unit.ServerPosition.To2D());
-                result.AddRange(unit.Path.Select(point => point.To2D()));
+                var path = unit.Path;
+                if (path.Length > 0)
+                {
+                    var first = path[0].To2D();
+                    if (first.Distance(result[0], true) > 40)
+                    {
+                        result.Add(first);    
+                    }
+                    
+                    for (int i = 1; i < path.Length; i++)
+                    {
+                        result.Add(path[i].To2D());
+                    }    
+                }
             }
             else if (WaypointTracker.StoredPaths.ContainsKey(unit.NetworkId))
             {
@@ -328,6 +373,18 @@ namespace LeagueSharp.Common
             return buff.IsActive && buff.EndTime - Game.Time > 0;
         }
 
+        /// <summary>
+        ///     Returns if the unit has the specified buff in the indicated amount of time
+        /// </summary>
+        public static bool HasBuffIn(this Obj_AI_Base unit, string displayName, float tickCount, bool includePing = true)
+        { 
+            return
+                unit.Buffs.Any(
+                    buff =>
+                        buff.IsValid && buff.DisplayName == displayName &&
+                        buff.EndTime - Game.Time > tickCount - (includePing ? (Game.Ping/2000f) : 0));
+        }
+ 
         /// <summary>
         ///     Returns if the unit has the buff and it is active
         /// </summary>
@@ -440,28 +497,39 @@ namespace LeagueSharp.Common
         /// </summary>
         public static int CountAlliesInRange(this Obj_AI_Base unit, float range)
         {
-            return unit.ServerPosition.CountAlliesInRange(range);
+            return unit.ServerPosition.CountAlliesInRange(range, unit);
         }
 
         /// <summary>
-        ///     Counts the allies in the range of the Point.
+        ///     Counts the allies in the range of the Point. 
         /// </summary>
-        public static int CountAlliesInRange(this Vector3 point, float range)
+        public static int CountAlliesInRange(this Vector3 point, float range, Obj_AI_Base originalunit = null)
         {
-            return HeroManager.Allies
-                .Count(x => x.IsValidTarget(range, false, point));
+            if (originalunit != null)
+            {
+                return HeroManager.Allies
+                    .Count(x => x.NetworkId != originalunit.NetworkId && x.IsValidTarget(range, false, point));
+            }
+                return HeroManager.Allies
+                 .Count(x => x.IsValidTarget(range, false, point));
         }
 
         public static List<Obj_AI_Hero> GetAlliesInRange(this Obj_AI_Base unit, float range)
         {
-            return GetAlliesInRange(unit.ServerPosition, range);
+            return GetAlliesInRange(unit.ServerPosition, range, unit);
         }
 
-        public static List<Obj_AI_Hero> GetAlliesInRange(this Vector3 point, float range)
+        public static List<Obj_AI_Hero> GetAlliesInRange(this Vector3 point, float range, Obj_AI_Base originalunit = null)
         {
+            if (originalunit != null)
+            {
+                return
+                    HeroManager.Allies
+                        .FindAll(x => x.NetworkId != originalunit.NetworkId && point.Distance(x.ServerPosition, true) <= range*range);
+            }
             return
-                HeroManager.Allies
-                    .FindAll(x => point.Distance(x.ServerPosition, true) <= range * range);
+                   HeroManager.Allies
+                       .FindAll(x => point.Distance(x.ServerPosition, true) <= range * range);
         }
 
         public static List<Obj_AI_Hero> GetEnemiesInRange(this Obj_AI_Base unit, float range)
