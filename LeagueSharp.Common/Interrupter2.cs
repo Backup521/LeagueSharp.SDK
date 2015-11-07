@@ -164,7 +164,7 @@ namespace LeagueSharp.Common
                 hero =>
                 {
                     if (CastingInterruptableSpell.ContainsKey(hero.NetworkId) &&
-                        !hero.Spellbook.IsCastingSpell &&
+                        //!hero.Spellbook.IsCastingSpell && //Much code wow
                         !hero.Spellbook.IsChanneling &&
                         !hero.Spellbook.IsCharging)
                     {
